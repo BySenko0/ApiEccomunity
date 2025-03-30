@@ -1,2 +1,6 @@
 # Alembic versions
 alembic/versions/
+venv
+# Ignorar archivos compilados de Python
+__pycache__/
+*.py[cod]

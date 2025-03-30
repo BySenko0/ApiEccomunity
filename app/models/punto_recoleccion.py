@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, Double
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class PuntoRecoleccion(Base):
@@ -10,3 +11,5 @@ class PuntoRecoleccion(Base):
     Latitud = Column(Double, nullable=True)
     Longitud = Column(Double, nullable=True)
     FechaCreacion = Column(Date, nullable=True)
+
+    recolecciones_usuarios = relationship("RecoleccionUsuario", back_populates="punto_recoleccion", cascade="all, delete-orphan")
