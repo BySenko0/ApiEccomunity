@@ -1,6 +1,11 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
+from pydantic import BaseModel, EmailStr
+
+class UsuarioLogin(BaseModel):
+    Correo: EmailStr
+    contrasena: str
 
 class UsuarioBase(BaseModel):
     Nombre: str
@@ -23,9 +28,17 @@ class UsuarioUpdate(BaseModel):
     Cooldown: Optional[str]
     url_perfil: Optional[str]
 
-class UsuarioOut(UsuarioBase):
+class UsuarioOut(BaseModel):
     Id: int
+    Nombre: str
+    Correo: EmailStr
+    Ubicacion: Optional[str]
+    Rol: str
+    Estado: Optional[str]
+    Cooldown: Optional[str]
+    url_perfil: Optional[str]
     FechaCreacion: Optional[datetime]
 
     class Config:
         orm_mode = True
+

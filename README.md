@@ -107,9 +107,6 @@ Edit
 📑 Documentación automática
 FastAPI genera automáticamente la documentación interactiva de todos los endpoints:
 
-Swagger UI → http://localhost:8000/docs
-
-ReDoc → http://localhost:8000/redoc
 
 🛠️ Flujo recomendado de desarrollo
 Acción	Herramienta
