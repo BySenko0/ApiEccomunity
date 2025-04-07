@@ -15,3 +15,6 @@ Base = declarative_base()
 async def get_db():
     async with SessionLocal() as session:
         yield session
+
+print("🔧 DATABASE_URL en uso:", DATABASE_URL)
+
