@@ -5,6 +5,7 @@ from app.routers import (
     recoleccion_usuario, tipo_reciclaje, empresa_tiporeciclaje,
     recoleccion_empresa, publicacion, comentario, bitacora, medalla
 )
+from create_db_and_tables import create_database, create_tables
 
 app = FastAPI(title="API de Recolección")
 
@@ -15,8 +16,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 # Registrar todos los routers
 app.include_router(empresa.router)
@@ -31,6 +30,11 @@ app.include_router(publicacion.router)
 app.include_router(comentario.router)
 app.include_router(bitacora.router)
 app.include_router(medalla.router)
+
+@app.on_event("startup")
+async def startup_event():
+    create_database()  
+    await create_tables()
 
 @app.get("/")
 async def root():
