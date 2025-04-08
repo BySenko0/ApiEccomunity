@@ -4,17 +4,16 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("❌ DATABASE_URL no está definida. Verifica tus variables en Railway.")
+
+print("🔧 DATABASE_URL en uso:", DATABASE_URL)
 
 engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
 
-# Dependencia para usar en endpoints
-async def get_db():
-    async with SessionLocal() as session:
-        yield session
 
-print("🔧 DATABASE_URL en uso:", DATABASE_URL)
 

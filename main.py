@@ -33,8 +33,19 @@ app.include_router(medalla.router)
 
 @app.on_event("startup")
 async def startup_event():
-    create_database()  
-    await create_tables()
+    try:
+        print("🚀 Ejecutando create_database()...")
+        create_database()
+        print("✅ Base de datos verificada.")
+
+        print("🚀 Ejecutando create_tables()...")
+        await create_tables()
+        print("✅ Tablas creadas correctamente.")
+
+    except Exception as e:
+        print("❌ Error durante startup:", str(e))
+        raise
+
 
 @app.get("/")
 async def root():
