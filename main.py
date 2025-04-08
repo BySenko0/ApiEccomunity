@@ -36,12 +36,11 @@ async def startup_event():
     try:
         print("🚀 Ejecutando create_database()...")
         create_database()
-        print("✅ Base de datos verificada.")
 
         print("🚀 Ejecutando create_tables()...")
         await create_tables()
-        print("✅ Tablas creadas correctamente.")
 
+        print("✅ Startup exitoso.")
     except Exception as e:
         print("❌ Error durante startup:", str(e))
         raise
