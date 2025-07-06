@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import (
     empresa, usuario, punto_recoleccion, horario_recoleccion,
     recoleccion_usuario, tipo_reciclaje, empresa_tiporeciclaje,
-    recoleccion_empresa, publicacion, comentario, bitacora, medalla
+    recoleccion_empresa, publicacion, comentario, bitacora, medalla, usuario_medalla
 )
 from create_db_and_tables import create_database, create_tables
 
@@ -30,6 +30,7 @@ app.include_router(publicacion.router)
 app.include_router(comentario.router)
 app.include_router(bitacora.router)
 app.include_router(medalla.router)
+app.include_router(usuario_medalla.router)
 
 @app.on_event("startup")
 async def startup_event():

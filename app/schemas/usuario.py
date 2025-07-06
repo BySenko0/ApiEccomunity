@@ -2,43 +2,44 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
+from pydantic import Field
+
 
 class UsuarioLogin(BaseModel):
-    Correo: EmailStr
+    correo: EmailStr
     contrasena: str
 
 class UsuarioBase(BaseModel):
-    Nombre: str
-    Correo: EmailStr
-    Ubicacion: Optional[str]
-    Rol: Optional[str] = "usuario"
-    Estado: Optional[str]
-    Cooldown: Optional[str]
-    url_perfil: Optional[str]
+    nombre: str
+    correo: EmailStr
+    ubicacion: Optional[str] = None
+    rol: Optional[str] = "usuario"
+    estado: Optional[str] = None
+    cooldown: Optional[str] = None
+    url_perfil: Optional[str] = None
 
 class UsuarioCreate(UsuarioBase):
     contrasena: str
 
-
 class UsuarioUpdate(BaseModel):
-    Nombre: Optional[str]
-    Ubicacion: Optional[str]
-    Rol: Optional[str]
-    Estado: Optional[str]
-    Cooldown: Optional[str]
-    url_perfil: Optional[str]
+    nombre: Optional[str] = None
+    ubicacion: Optional[str] = None
+    rol: Optional[str] = None
+    estado: Optional[str] = None
+    cooldown: Optional[str] = None
+    url_perfil: Optional[str] = None
 
 class UsuarioOut(BaseModel):
-    Id: int
-    Nombre: str
-    Correo: EmailStr
-    Ubicacion: Optional[str]
-    Rol: str
-    Estado: Optional[str]
-    Cooldown: Optional[str]
-    url_perfil: Optional[str]
-    FechaCreacion: Optional[datetime]
+    id: int = Field(alias="Id")
+    nombre: str = Field(alias="Nombre")
+    correo: EmailStr = Field(alias="Correo")
+    ubicacion: Optional[str] = Field(alias="Ubicacion", default=None)
+    rol: str = Field(alias="Rol")
+    estado: Optional[str] = Field(alias="Estado", default=None)
+    cooldown: Optional[str] = Field(alias="Cooldown", default=None)
+    url_perfil: Optional[str] = Field(alias="url_perfil", default=None)
+    fecha_creacion: Optional[datetime] = Field(alias="FechaCreacion", default=None)
 
     class Config:
         orm_mode = True
-
+        allow_population_by_field_name = True

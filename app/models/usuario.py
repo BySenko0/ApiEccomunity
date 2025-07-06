@@ -19,5 +19,6 @@ class Usuario(Base):
     publicaciones = relationship("Publicacion", back_populates="autor", cascade="all, delete")
     comentarios = relationship("Comentario", back_populates="usuario", cascade="all, delete")
     recolecciones = relationship("RecoleccionUsuario", back_populates="usuario", cascade="all, delete")
-    medallas = relationship("Medalla", back_populates="usuario", cascade="all, delete")
-
+    
+    # ✅ Relación correcta hacia tabla intermedia
+    usuario_medallas = relationship("UsuarioMedalla", backref="usuario", cascade="all, delete")
