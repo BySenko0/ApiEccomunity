@@ -1,23 +1,34 @@
 from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import date
+from typing import Optional
 
-class TipoReciclajeBase(BaseModel):
-    Nombre: str = Field(..., min_length=1, max_length=100)
-    PesoMinimo: Optional[float] = Field(default=None, ge=0)
-    PesoMaximo: Optional[float] = Field(default=None, ge=0)
-    PagoPorKg: Optional[float] = Field(default=None, ge=0)
-    GananciaPorKg: Optional[float] = Field(default=None, ge=0)
-    FechaCreacion: Optional[date] = None
+# 🟢 Esquema para crear un tipo de reciclaje
+class TipoReciclajeCreate(BaseModel):
+    nombre: str
+    peso_minimo: float
+    peso_maximo: float
+    pago_por_kg: float
+    ganancia_por_kg: float
+    fecha_creacion: date
 
-class TipoReciclajeCreate(TipoReciclajeBase):
-    pass
+# 🟡 Esquema para actualizar un tipo de reciclaje (todos los campos opcionales)
+class TipoReciclajeUpdate(BaseModel):
+    nombre: Optional[str] = None
+    peso_minimo: Optional[float] = None
+    peso_maximo: Optional[float] = None
+    pago_por_kg: Optional[float] = None
+    ganancia_por_kg: Optional[float] = None
+    fecha_creacion: Optional[date] = None
 
-class TipoReciclajeUpdate(TipoReciclajeBase):
-    pass
-
-class TipoReciclajeOut(TipoReciclajeBase):
-    Id: int
+# 🔵 Esquema para devolver datos al cliente
+class TipoReciclajeOut(BaseModel):
+    id: int = Field(alias="Id")
+    nombre: str = Field(alias="Nombre")
+    peso_minimo: float = Field(alias="PesoMinimo")
+    peso_maximo: float = Field(alias="PesoMaximo")
+    pago_por_kg: float = Field(alias="PagoPorKg")
+    ganancia_por_kg: float = Field(alias="GananciaPorKg")
+    fecha_creacion: date = Field(alias="FechaCreacion")
 
     class Config:
-        from_attributes = True  # Para Pydantic v2 (usa orm_mode=True si usas v1)
+        from_attributes = True  # Permite leer atributos ORM (reemplaza orm_mode en Pydantic v2)

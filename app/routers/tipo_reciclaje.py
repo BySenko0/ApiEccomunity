@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
-from app.schemas.tipo_reciclaje import TipoReciclajeCreate, TipoReciclajeUpdate, TipoReciclajeOut
+from app.schemas.tipo_reciclaje import (
+    TipoReciclajeCreate, TipoReciclajeUpdate, TipoReciclajeOut
+)
 from app.crud import tipo_reciclaje as crud
 
 router = APIRouter(prefix="/tipos-reciclaje", tags=["Tipos de Reciclaje"])
