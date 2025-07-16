@@ -8,6 +8,7 @@ class PublicacionBase(BaseModel):
     Imagen: Optional[str]
     FechaPublicacion: date
     id_Usuario: int
+    Likes: int
 
 class PublicacionCreate(PublicacionBase):
     pass

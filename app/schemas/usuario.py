@@ -13,7 +13,7 @@ class UsuarioBase(BaseModel):
     nombre: str
     correo: EmailStr
     ubicacion: Optional[str] = None
-    rol: Optional[str] = "usuario"
+    rol: Optional[str] = None
     estado: Optional[str] = None
     cooldown: Optional[str] = None
     url_perfil: Optional[str] = None

@@ -3,6 +3,8 @@ from sqlalchemy.future import select
 from app.models.comentario import Comentario
 from app.schemas.comentario import ComentarioCreate, ComentarioUpdate
 
+from sqlalchemy import func
+
 async def get_all(db: AsyncSession):
     result = await db.execute(select(Comentario))
     return result.scalars().all()
@@ -33,3 +35,21 @@ async def delete(db: AsyncSession, comentario_id: int):
         await db.delete(comentario)
         await db.commit()
     return comentario
+
+async def get_by_publicacion(db: AsyncSession, publicacion_id: int):
+    result = await db.execute(select(Comentario).where(Comentario.id_Publicacion == publicacion_id))
+    return result.scalars().all()
+
+
+async def comments_count_by_posts(db: AsyncSession):
+    stmt = (
+        select(
+            Comentario.id_Publicacion,
+            func.count(Comentario.Id).label("count")
+        )
+        .group_by(Comentario.id_Publicacion)
+    )
+    
+    result = await db.execute(stmt)
+    
+    return {row.id_Publicacion: row.count for row in result.all()}

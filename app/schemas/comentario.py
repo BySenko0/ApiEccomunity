@@ -6,6 +6,7 @@ class ComentarioBase(BaseModel):
     Fecha: date
     id_Publicacion: int
     id_Usuario: int
+    Likes:int
 
 class ComentarioCreate(ComentarioBase):
     pass

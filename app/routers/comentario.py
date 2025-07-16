@@ -4,7 +4,15 @@ from app.database import get_db
 from app.schemas.comentario import ComentarioCreate, ComentarioUpdate, ComentarioOut
 from app.crud import comentario as crud
 
+from typing import Dict
+
 router = APIRouter(prefix="/comentarios", tags=["Comentarios"])
+
+
+@router.get("/count", response_model=Dict[int, int])
+async def comentarios_count_por_publicacion(db: AsyncSession = Depends(get_db)):
+    return await crud.comments_count_by_posts(db)
+
 
 @router.get("/", response_model=list[ComentarioOut])
 async def listar(db: AsyncSession = Depends(get_db)):
@@ -34,3 +42,10 @@ async def eliminar(comentario_id: int, db: AsyncSession = Depends(get_db)):
     if not eliminado:
         raise HTTPException(status_code=404, detail="Comentario no encontrado")
     return {"ok": True, "mensaje": "Comentario eliminado correctamente"}
+
+@router.get("/comentarios_publicacion/{publicacion_id}", response_model=list[ComentarioOut])
+async def comentarios_por_publicacion(publicacion_id: int, db: AsyncSession = Depends(get_db)):
+    comentarios = await crud.get_by_publicacion(db, publicacion_id)
+    if not comentarios:
+        return []
+    return comentarios
