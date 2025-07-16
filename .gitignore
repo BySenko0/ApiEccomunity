@@ -1,7 +1,27 @@
-# Alembic versions
-alembic/versions/
-venv
-# Ignorar archivos compilados de Python
+# Entornos virtuales
+env/
+venv/
+
+# Archivos compilados de Python
 __pycache__/
 *.py[cod]
-env
+
+# Archivos de configuración de entorno
+.env
+
+# VSCode config
+.vscode/
+
+# PyCharm config
+.idea/
+
+# Archivos de entorno de virtualenv
+*.venv
+pyvenv.cfg
+
+# Archivos temporales
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
