@@ -5,14 +5,13 @@ from app.routers import (
     recoleccion_usuario, tipo_reciclaje, empresa_tiporeciclaje,
     recoleccion_empresa, publicacion, comentario, bitacora, medalla, usuario_medalla
 )
-from create_db_and_tables import create_database, create_tables
+from create_db_and_tables import create_tables  # Eliminamos create_database
 
 app = FastAPI(title="API de Recolección")
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=["http://127.0.0.1:5000", "http://localhost:5000"],  # Laravel
-    allow_origins=["*"],  # Permitir todas las solicitudes de origen
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,17 +35,12 @@ app.include_router(usuario_medalla.router)
 @app.on_event("startup")
 async def startup_event():
     try:
-        print("🚀 Ejecutando create_database()...")
-        create_database()
-
         print("🚀 Ejecutando create_tables()...")
         await create_tables()
-
         print("✅ Startup exitoso.")
     except Exception as e:
         print("❌ Error durante startup:", str(e))
         raise
-
 
 @app.get("/")
 async def root():
