@@ -1,7 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.comentario import Comentario
+from app.models.usuario import Usuario
 from app.schemas.comentario import ComentarioCreate, ComentarioUpdate
+from sqlalchemy.orm import selectinload, joinedload
 
 from sqlalchemy import func
 
@@ -36,10 +38,24 @@ async def delete(db: AsyncSession, comentario_id: int):
         await db.commit()
     return comentario
 
-async def get_by_publicacion(db: AsyncSession, publicacion_id: int):
-    result = await db.execute(select(Comentario).where(Comentario.id_Publicacion == publicacion_id))
-    return result.scalars().all()
 
+async def get_by_publicacion(db: AsyncSession, publicacion_id: int):
+    query = (
+        select(
+            Comentario.Id,
+            Comentario.Texto,
+            Comentario.Fecha,
+            Comentario.id_Publicacion,
+            Comentario.id_Usuario,
+            Usuario.Nombre.label("NombreUsuario")
+        )
+        .join(Usuario, Comentario.id_Usuario == Usuario.Id)
+        .where(Comentario.id_Publicacion == publicacion_id)
+        .order_by(Comentario.Fecha.desc())
+    )
+    
+    result = await db.execute(query)
+    return result.mappings().all()
 
 async def comments_count_by_posts(db: AsyncSession):
     stmt = (

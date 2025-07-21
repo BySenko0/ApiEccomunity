@@ -9,3 +9,5 @@ from .empresa_tiporeciclaje import EmpresaTipoReciclaje
 from .publicacion import Publicacion
 from .comentario import Comentario
 from .bitacora import Bitacora
+from .likes_publicaciones import Likes_Publicaciones
+from .likes_comentarios import Likes_Comentarios

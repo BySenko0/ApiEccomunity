@@ -17,9 +17,12 @@ async def obtener(pub_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Publicación no encontrada")
     return dato
 
-@router.post("/", response_model=PublicacionOut)
+@router.post("/", response_model=bool)
 async def crear(data: PublicacionCreate, db: AsyncSession = Depends(get_db)):
-    return await crud.create(db, data)
+    post = await crud.create(db, data)
+    if not post:
+        raise HTTPException(status_code=400, detail="Error al crear la publicación")
+    return True
 
 @router.put("/{pub_id}", response_model=PublicacionOut)
 async def actualizar(pub_id: int, data: PublicacionUpdate, db: AsyncSession = Depends(get_db)):

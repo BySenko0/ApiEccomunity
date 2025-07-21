@@ -1,12 +1,11 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime as date
 
 class ComentarioBase(BaseModel):
     Texto: str
     Fecha: date
     id_Publicacion: int
     id_Usuario: int
-    Likes:int
 
 class ComentarioCreate(ComentarioBase):
     pass
@@ -16,6 +15,7 @@ class ComentarioUpdate(ComentarioBase):
 
 class ComentarioOut(ComentarioBase):
     Id: int
+    NombreUsuario: str
 
     class Config:
         orm_mode = True

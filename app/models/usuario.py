@@ -22,3 +22,6 @@ class Usuario(Base):
     
     # ✅ Relación correcta hacia tabla intermedia
     usuario_medallas = relationship("UsuarioMedalla", backref="usuario", cascade="all, delete")
+
+    likes_publicaciones = relationship("Likes_Publicaciones", back_populates="usuario", cascade="all, delete")
+    likes_comentarios = relationship("Likes_Comentarios", back_populates="usuario", cascade="all, delete")

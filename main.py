@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import (
-    empresa, usuario, punto_recoleccion, horario_recoleccion,
+    empresa, likes_publicaciones, usuario, punto_recoleccion, horario_recoleccion,
     recoleccion_usuario, tipo_reciclaje, empresa_tiporeciclaje,
-    recoleccion_empresa, publicacion, comentario, bitacora, medalla, usuario_medalla
+    recoleccion_empresa, publicacion, comentario, bitacora, medalla, usuario_medalla, likes_comentarios
 )
 from create_db_and_tables import create_tables  # Eliminamos create_database
 
@@ -31,6 +31,8 @@ app.include_router(comentario.router)
 app.include_router(bitacora.router)
 app.include_router(medalla.router)
 app.include_router(usuario_medalla.router)
+app.include_router(likes_publicaciones.router)
+app.include_router(likes_comentarios.router)
 
 @app.on_event("startup")
 async def startup_event():

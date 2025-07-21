@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime as date
 from typing import Optional
 
 class PublicacionBase(BaseModel):
@@ -8,7 +8,6 @@ class PublicacionBase(BaseModel):
     Imagen: Optional[str]
     FechaPublicacion: date
     id_Usuario: int
-    Likes: int
 
 class PublicacionCreate(PublicacionBase):
     pass
@@ -18,6 +17,7 @@ class PublicacionUpdate(PublicacionBase):
 
 class PublicacionOut(PublicacionBase):
     Id: int
+    NombreUsuario: str 
 
     class Config:
         orm_mode = True

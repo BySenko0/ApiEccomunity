@@ -2,14 +2,44 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.publicacion import Publicacion
 from app.schemas.publicacion import PublicacionCreate, PublicacionUpdate
+from app.models.usuario import Usuario
+
 
 async def get_all(db: AsyncSession):
-    result = await db.execute(select(Publicacion))
-    return result.scalars().all()
+    # result = await db.execute(select(Publicacion).order_by(Publicacion.FechaPublicacion.desc()))
+    query = (
+        select( 
+            Publicacion.Id,
+            Publicacion.Titulo,
+            Publicacion.Contenido,
+            Publicacion.Imagen,
+            Publicacion.FechaPublicacion,
+            Publicacion.id_Usuario,
+            Usuario.Nombre.label("NombreUsuario"),
+        )
+        .join(Usuario, Publicacion.id_Usuario == Usuario.Id)
+        .order_by(Publicacion.FechaPublicacion.desc())
+    )
+    result = await db.execute(query)
+    return result.mappings().all() 
 
 async def get_by_id(db: AsyncSession, pub_id: int):
-    result = await db.execute(select(Publicacion).where(Publicacion.Id == pub_id))
-    return result.scalar_one_or_none()
+    # result = await db.execute(select(Publicacion).where(Publicacion.Id == pub_id))
+    query = (
+        select(
+            Publicacion.Id,
+            Publicacion.Titulo,
+            Publicacion.Contenido,
+            Publicacion.Imagen,
+            Publicacion.FechaPublicacion,
+            Publicacion.id_Usuario,
+            Usuario.Nombre.label("NombreUsuario"),
+        )
+        .join(Usuario, Publicacion.id_Usuario == Usuario.Id)
+        .where(Publicacion.Id == pub_id)
+    )
+    result = await db.execute(query)
+    return result.mappings().first()
 
 async def create(db: AsyncSession, data: PublicacionCreate):
     nueva = Publicacion(**data.dict())
