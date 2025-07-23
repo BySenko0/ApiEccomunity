@@ -15,6 +15,8 @@ class Usuario(Base):
     Cooldown = Column(String(50), nullable=True)
     url_perfil = Column(String(255), nullable=True)
     FechaCreacion = Column(DateTime, server_default=func.now(), nullable=False)
+    Imagen_perfil = Column(String(255), nullable=True)
+    Imagen_fondo = Column(String(255), nullable=True)
 
     publicaciones = relationship("Publicacion", back_populates="autor", cascade="all, delete")
     comentarios = relationship("Comentario", back_populates="usuario", cascade="all, delete")

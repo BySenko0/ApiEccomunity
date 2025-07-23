@@ -17,6 +17,8 @@ class UsuarioBase(BaseModel):
     estado: Optional[str] = None
     cooldown: Optional[str] = None
     url_perfil: Optional[str] = None
+    imagen_perfil: Optional[str] = None
+    imagen_fondo: Optional[str] = None
 
 class UsuarioCreate(UsuarioBase):
     contrasena: str
@@ -28,6 +30,8 @@ class UsuarioUpdate(BaseModel):
     estado: Optional[str] = None
     cooldown: Optional[str] = None
     url_perfil: Optional[str] = None
+    imagen_perfil: Optional[str] = None
+    imagen_fondo: Optional[str] = None
 
 class UsuarioOut(BaseModel):
     id: int = Field(alias="Id")
@@ -39,6 +43,8 @@ class UsuarioOut(BaseModel):
     cooldown: Optional[str] = Field(alias="Cooldown", default=None)
     url_perfil: Optional[str] = Field(alias="url_perfil", default=None)
     fecha_creacion: Optional[datetime] = Field(alias="FechaCreacion", default=None)
+    imagen_perfil: Optional[str] = Field(alias="Imagen_perfil", default='default.png')
+    imagen_fondo: Optional[str] = Field(alias="Imagen_fondo", default=None)
 
     class Config:
         orm_mode = True

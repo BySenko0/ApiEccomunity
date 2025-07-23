@@ -1,13 +1,18 @@
 from pydantic import BaseModel
-from datetime import datetime as date
+from datetime import datetime
 from typing import Optional
 
 class PublicacionBase(BaseModel):
     Titulo: str
-    Contenido: Optional[str]
-    Imagen: Optional[str]
-    FechaPublicacion: date
+    Contenido: Optional[str] = None
+    Imagen: Optional[str] = None
+    FechaPublicacion: Optional[datetime] = None
     id_Usuario: int
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
 class PublicacionCreate(PublicacionBase):
     pass

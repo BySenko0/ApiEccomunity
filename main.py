@@ -7,7 +7,14 @@ from app.routers import (
 )
 from create_db_and_tables import create_tables  # Eliminamos create_database
 
+from fastapi.staticfiles import StaticFiles
+import os
+
 app = FastAPI(title="API de Recolección")
+
+UPLOAD_DIR = "static/imagenes"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,

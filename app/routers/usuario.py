@@ -9,21 +9,9 @@ from app.crud import usuario as crud
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
-@router.post("/login")
-async def login(datos: UsuarioLogin, db: AsyncSession = Depends(get_db)):
-    query = select(Usuario).where(Usuario.Correo == datos.Correo)
-    result = await db.execute(query)
-    usuario = result.scalar_one_or_none()
-
-    if not usuario or usuario.contrasena != datos.contrasena:
-        raise HTTPException(status_code=401, detail="Credenciales inválidas")
-
-    return {
-        "id": usuario.Id,
-        "nombre": usuario.Nombre,
-        "rol": usuario.Rol
-    }
-
+@router.post("/login", response_model=UsuarioOut| str)
+async def login(usuario: UsuarioLogin, db: AsyncSession = Depends(get_db)):
+    return await crud.login_usuario(db, usuario)
 
 @router.get("/", response_model=list[UsuarioOut])
 async def listar_usuarios(db: AsyncSession = Depends(get_db)):

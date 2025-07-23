@@ -4,13 +4,24 @@ from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.usuario import Usuario
-from app.schemas.usuario import UsuarioCreate, UsuarioUpdate
+from app.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, UsuarioLogin
 
 # Contexto para hashear contraseñas
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
+
+async def login_usuario(db: AsyncSession, usuario):
+    result = await db.execute(
+        select(Usuario).where(Usuario.Correo == usuario.correo)
+    )
+    usuario_db = result.scalar_one_or_none()
+    
+    if usuario_db and pwd_context.verify(usuario.contrasena, usuario_db.contrasena):
+        return usuario_db
+    else:
+        return "Credenciales inválidas"
 
 async def get_all_usuarios(db: AsyncSession) -> list[Usuario]:
     result = await db.execute(select(Usuario))
@@ -31,7 +42,9 @@ async def create_usuario(db: AsyncSession, usuario: UsuarioCreate) -> Usuario:
         Rol=usuario.rol,
         Estado=usuario.estado,
         Cooldown=usuario.cooldown,
-        url_perfil=usuario.url_perfil
+        url_perfil=usuario.url_perfil,
+        Imagen_perfil=usuario.imagen_perfil,
+        Imagen_fondo=usuario.imagen_fondo
     )
     db.add(nuevo_usuario)
     await db.commit()
