@@ -4,8 +4,8 @@ from app.models.comentario import Comentario
 from app.models.usuario import Usuario
 from app.schemas.comentario import ComentarioCreate, ComentarioUpdate
 from sqlalchemy.orm import selectinload, joinedload
-
 from sqlalchemy import func
+import os
 
 async def get_all(db: AsyncSession):
     result = await db.execute(select(Comentario))
@@ -47,7 +47,8 @@ async def get_by_publicacion(db: AsyncSession, publicacion_id: int):
             Comentario.Fecha,
             Comentario.id_Publicacion,
             Comentario.id_Usuario,
-            Usuario.Nombre.label("NombreUsuario")
+            Usuario.Nombre.label("NombreUsuario"),
+            Usuario.Imagen_perfil.label("ImagenPerfilUsuario")  # Nuevo campo añadido
         )
         .join(Usuario, Comentario.id_Usuario == Usuario.Id)
         .where(Comentario.id_Publicacion == publicacion_id)
@@ -55,7 +56,26 @@ async def get_by_publicacion(db: AsyncSession, publicacion_id: int):
     )
     
     result = await db.execute(query)
-    return result.mappings().all()
+    comentarios = result.mappings().all()
+    
+    # Convertir RowMapping a dict y añadir URL de imagen de perfil
+    comentarios_con_url = []
+    for comentario in comentarios:
+
+        comentario_dict = dict(comentario)
+
+        APP_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+        STATIC_IMG_FILES_PATH = os.getenv("STATIC_FILES_PATH", "/static/imagenes")
+
+        # Añadir URL de la imagen de perfil del usuario
+        if comentario_dict['ImagenPerfilUsuario']:
+            comentario_dict['ImagenPerfilUsuarioUrl'] = f"{APP_BASE_URL}{STATIC_IMG_FILES_PATH}/perfil/{comentario_dict['ImagenPerfilUsuario']}"
+        else:
+            comentario_dict['ImagenPerfilUsuarioUrl'] = None
+
+        comentarios_con_url.append(comentario_dict)
+    
+    return comentarios_con_url
 
 async def comments_count_by_posts(db: AsyncSession):
     stmt = (

@@ -33,6 +33,12 @@ async def obtener(pub_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Publicación no encontrada")
     return dato
 
+@router.get("/por/{user_id}", response_model=list[PublicacionOut])
+async def obtener_por_usuario(user_id: int, db: AsyncSession = Depends(get_db)):
+    publicaciones = await crud.get_by_user_id(db, user_id)
+    if not publicaciones:
+        raise HTTPException(status_code=404, detail="No se encontraron publicaciones para este usuario")
+    return publicaciones
 
 @router.post("/", response_model=int)
 async def crear(data: str = Form(...), db: AsyncSession = Depends(get_db), file: UploadFile = File(None)):

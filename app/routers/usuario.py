@@ -9,9 +9,6 @@ from app.crud import usuario as crud
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
-@router.post("/login", response_model=UsuarioOut| str)
-async def login(usuario: UsuarioLogin, db: AsyncSession = Depends(get_db)):
-    return await crud.login_usuario(db, usuario)
 
 @router.get("/", response_model=list[UsuarioOut])
 async def listar_usuarios(db: AsyncSession = Depends(get_db)):
@@ -27,6 +24,10 @@ async def obtener_usuario(usuario_id: int, db: AsyncSession = Depends(get_db)):
 @router.post("/", response_model=UsuarioOut)
 async def crear_usuario(usuario: UsuarioCreate, db: AsyncSession = Depends(get_db)):
     return await crud.create_usuario(db, usuario)
+
+@router.post("/login", response_model=UsuarioOut| str)
+async def login(usuario: UsuarioLogin, db: AsyncSession = Depends(get_db)):
+    return await crud.login_usuario(db, usuario)
 
 @router.put("/{usuario_id}", response_model=UsuarioOut)
 async def actualizar_usuario(usuario_id: int, usuario: UsuarioUpdate, db: AsyncSession = Depends(get_db)):

@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioOut, UsuarioLogin
+from typing import Optional
+import os
 
 # Contexto para hashear contraseñas
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -27,11 +29,34 @@ async def get_all_usuarios(db: AsyncSession) -> list[Usuario]:
     result = await db.execute(select(Usuario))
     return result.scalars().all()
 
-async def get_usuario_by_id(db: AsyncSession, usuario_id: int) -> Usuario | None:
+async def get_usuario_by_id(db: AsyncSession, usuario_id: int) -> Optional[UsuarioOut]:
     result = await db.execute(
         select(Usuario).where(Usuario.Id == usuario_id)
     )
-    return result.scalar_one_or_none()
+    usuario = result.scalar_one_or_none()
+    
+    if usuario:
+        # Convertir a diccionario para poder añadir las URLs
+        usuario_dict = usuario.__dict__
+        
+        APP_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+        STATIC_IMG_FILES_PATH = os.getenv("STATIC_IMG_FILES_PATH", "/static/imagenes")
+
+        # Añadir URL de imagen de perfil
+        if usuario_dict.get('Imagen_perfil'):
+            usuario_dict['ImagenPerfilUrl'] = f"{APP_BASE_URL}{STATIC_IMG_FILES_PATH}/perfil/{usuario_dict['Imagen_perfil']}"
+        else:
+            usuario_dict['ImagenPerfilUrl'] = None
+            
+        # Añadir URL de imagen de fondo
+        if usuario_dict.get('Imagen_fondo'):
+            usuario_dict['ImagenFondoUrl'] = f"{APP_BASE_URL}{STATIC_IMG_FILES_PATH}/fondo/{usuario_dict['Imagen_fondo']}"
+        else:
+            usuario_dict['ImagenFondoUrl'] = None
+            
+        return UsuarioOut(**usuario_dict)
+    
+    return None
 
 async def create_usuario(db: AsyncSession, usuario: UsuarioCreate) -> Usuario:
     nuevo_usuario = Usuario(

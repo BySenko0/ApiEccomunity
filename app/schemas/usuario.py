@@ -4,6 +4,11 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from pydantic import Field
 
+from pydantic import BaseModel, EmailStr, HttpUrl
+from typing import Optional
+from datetime import datetime
+from pydantic import Field
+
 
 class UsuarioLogin(BaseModel):
     correo: EmailStr
@@ -45,7 +50,13 @@ class UsuarioOut(BaseModel):
     fecha_creacion: Optional[datetime] = Field(alias="FechaCreacion", default=None)
     imagen_perfil: Optional[str] = Field(alias="Imagen_perfil", default='default.png')
     imagen_fondo: Optional[str] = Field(alias="Imagen_fondo", default=None)
+    ImagenPerfilUrl: Optional[HttpUrl] = None  # Nueva URL de imagen de perfil
+    ImagenFondoUrl: Optional[HttpUrl] = None   # Nueva URL de imagen de fondo
 
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
+        json_encoders = {
+            'HttpUrl': lambda v: str(v) if v else None,
+            'datetime': lambda v: v.isoformat()
+        }
