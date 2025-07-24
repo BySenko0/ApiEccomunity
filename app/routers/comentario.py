@@ -25,9 +25,19 @@ async def obtener(comentario_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Comentario no encontrado")
     return dato
 
-@router.post("/", response_model=ComentarioOut)
+@router.get("/comentarios_publicacion/{publicacion_id}", response_model=list[ComentarioOut])
+async def comentarios_por_publicacion(publicacion_id: int, db: AsyncSession = Depends(get_db)):
+    comentarios = await crud.get_by_publicacion(db, publicacion_id)
+    if not comentarios:
+        return []
+    return comentarios
+
+@router.post("/", response_model=bool)
 async def crear(data: ComentarioCreate, db: AsyncSession = Depends(get_db)):
-    return await crud.create(db, data)
+    comentario = await crud.create(db, data)
+    if not comentario:
+        raise HTTPException(status_code=400, detail="Error al crear el comentario")
+    return True
 
 @router.put("/{comentario_id}", response_model=ComentarioOut)
 async def actualizar(comentario_id: int, data: ComentarioUpdate, db: AsyncSession = Depends(get_db)):
@@ -43,9 +53,3 @@ async def eliminar(comentario_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Comentario no encontrado")
     return {"ok": True, "mensaje": "Comentario eliminado correctamente"}
 
-@router.get("/comentarios_publicacion/{publicacion_id}", response_model=list[ComentarioOut])
-async def comentarios_por_publicacion(publicacion_id: int, db: AsyncSession = Depends(get_db)):
-    comentarios = await crud.get_by_publicacion(db, publicacion_id)
-    if not comentarios:
-        return []
-    return comentarios

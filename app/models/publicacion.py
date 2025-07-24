@@ -11,7 +11,7 @@ class Publicacion(Base):
     Imagen = Column(String(255), nullable=True)
     FechaPublicacion = Column(DateTime, server_default=func.now(), nullable=False)
     id_Usuario = Column(Integer, ForeignKey("usuarios.Id", ondelete="CASCADE"), nullable=False)
-    Likes = Column(Integer, default=0, nullable=False)
 
     autor = relationship("Usuario", back_populates="publicaciones")
     comentarios = relationship("Comentario", back_populates="publicacion", cascade="all, delete")
+    likes_publicaciones = relationship("Likes_Publicaciones", back_populates="publicacion", cascade="all, delete")
