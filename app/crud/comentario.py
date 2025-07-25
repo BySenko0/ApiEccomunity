@@ -89,3 +89,13 @@ async def comments_count_by_posts(db: AsyncSession):
     result = await db.execute(stmt)
     
     return {row.id_Publicacion: row.count for row in result.all()}
+
+async def comments_count_by_postId(db: AsyncSession, publicacion_id: int):
+    stmt = (
+        select(func.count(Comentario.Id))
+        .where(Comentario.id_Publicacion == publicacion_id)
+    )
+    
+    result = await db.execute(stmt)
+    
+    return result.scalar_one_or_none() or 0
