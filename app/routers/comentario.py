@@ -32,6 +32,13 @@ async def comentarios_por_publicacion(publicacion_id: int, db: AsyncSession = De
         return []
     return comentarios
 
+@router.get("/count/{publicacion_id}", response_model=int)
+async def comentarios_count_por_publicacion(publicacion_id: int, db: AsyncSession = Depends(get_db)):
+    count = await crud.comments_count_by_postId(db, publicacion_id)
+    if count is None:
+        raise HTTPException(status_code=404, detail="Publicación no encontrada")
+    return count
+
 @router.post("/", response_model=bool)
 async def crear(data: ComentarioCreate, db: AsyncSession = Depends(get_db)):
     comentario = await crud.create(db, data)
