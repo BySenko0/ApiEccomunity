@@ -59,22 +59,26 @@ async def get_usuario_by_id(db: AsyncSession, usuario_id: int) -> Optional[Usuar
     return None
 
 async def create_usuario(db: AsyncSession, usuario: UsuarioCreate) -> Usuario:
-    nuevo_usuario = Usuario(
-        Nombre=usuario.nombre,
-        Correo=usuario.correo,
-        contrasena=hash_password(usuario.contrasena),
-        Ubicacion=usuario.ubicacion,
-        Rol=usuario.rol,
-        Estado=usuario.estado,
-        Cooldown=usuario.cooldown,
-        url_perfil=usuario.url_perfil,
-        Imagen_perfil=usuario.imagen_perfil,
-        Imagen_fondo=usuario.imagen_fondo
-    )
-    db.add(nuevo_usuario)
-    await db.commit()
-    await db.refresh(nuevo_usuario)
-    return nuevo_usuario
+    try:
+        nuevo_usuario = Usuario(
+            Nombre=usuario.nombre,
+            Correo=usuario.correo,
+            contrasena=hash_password(usuario.contrasena),
+            Ubicacion=usuario.ubicacion,
+            Rol=usuario.rol,
+            Estado=usuario.estado,
+            Cooldown=usuario.cooldown,
+            url_perfil=usuario.url_perfil,
+            Imagen_perfil=usuario.imagen_perfil,
+            Imagen_fondo=usuario.imagen_fondo
+        )
+        db.add(nuevo_usuario)
+        await db.commit()
+        await db.refresh(nuevo_usuario)
+        return nuevo_usuario
+    except Exception as e:
+        await db.rollback()
+        raise e
 
 async def update_usuario(
     db: AsyncSession,
