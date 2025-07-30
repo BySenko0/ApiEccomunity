@@ -37,7 +37,7 @@ async def obtener(pub_id: int, db: AsyncSession = Depends(get_db)):
 async def obtener_por_usuario(user_id: int, db: AsyncSession = Depends(get_db)):
     publicaciones = await crud.get_by_user_id(db, user_id)
     if not publicaciones:
-        raise HTTPException(status_code=404, detail="No se encontraron publicaciones para este usuario")
+        return []
     return publicaciones
 
 @router.post("/", response_model=int)

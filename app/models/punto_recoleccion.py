@@ -13,3 +13,4 @@ class PuntoRecoleccion(Base):
     FechaCreacion = Column(Date, nullable=True)
 
     recolecciones_usuarios = relationship("RecoleccionUsuario", back_populates="punto_recoleccion", cascade="all, delete-orphan")
+    centros_tipos_reciclaje = relationship("CentroTipoReciclaje", back_populates="punto_recoleccion", cascade="all, delete-orphan")
