@@ -12,3 +12,4 @@ class CentroTipoReciclaje(Base):
 
     punto_recoleccion = relationship("PuntoRecoleccion", back_populates="centros_tipos_reciclaje")
     tipo_reciclaje = relationship("TipoReciclaje", back_populates="centros_tipos_reciclaje")
+    residuos_recolecciones = relationship("ResiduosRecolecciones", back_populates="centro_tipo_reciclaje", cascade="all, delete-orphan")
