@@ -2,14 +2,60 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.recoleccion_usuario import RecoleccionUsuario
 from app.schemas.recoleccion_usuario import RecoleccionCreate, RecoleccionUpdate
+from app.models.punto_recoleccion import PuntoRecoleccion
+from app.models.usuario import Usuario
+
 
 async def get_all_recolecciones(db: AsyncSession):
     result = await db.execute(select(RecoleccionUsuario))
     return result.scalars().all()
 
 async def get_recoleccion_by_id(db: AsyncSession, reco_id: int):
-    result = await db.execute(select(RecoleccionUsuario).where(RecoleccionUsuario.Id == reco_id))
-    return result.scalar_one_or_none()
+
+    query = (
+        select(
+            RecoleccionUsuario.Id,
+            RecoleccionUsuario.Tipo,
+            RecoleccionUsuario.Dia,
+            RecoleccionUsuario.Hora,
+            RecoleccionUsuario.Cantidad,
+            RecoleccionUsuario.Status,
+            RecoleccionUsuario.id_PuntoRecoleccion,
+            RecoleccionUsuario.id_Usuario,
+            PuntoRecoleccion.Nombre.label("PuntoRecoleccion"),
+            PuntoRecoleccion.Ubicacion.label("DireccionPunto"),
+            Usuario.Nombre.label("UsuarioNombre"),
+            )
+            .where(RecoleccionUsuario.Id == reco_id)
+            .join(PuntoRecoleccion, RecoleccionUsuario.id_PuntoRecoleccion == PuntoRecoleccion.Id)
+            .join(Usuario, RecoleccionUsuario.id_Usuario == Usuario.Id)
+    )
+    result = await db.execute(query)
+    return result.first()
+
+async def get_recolecciones_by_usuario(db: AsyncSession, usuario_id: int):
+    query = (
+        select(
+            RecoleccionUsuario.Id,
+            RecoleccionUsuario.Tipo,
+            RecoleccionUsuario.Dia,
+            RecoleccionUsuario.Hora,
+            RecoleccionUsuario.Cantidad,
+            RecoleccionUsuario.Status,
+            RecoleccionUsuario.id_PuntoRecoleccion,
+            RecoleccionUsuario.id_Usuario,
+            PuntoRecoleccion.Nombre.label("PuntoRecoleccion"),
+            PuntoRecoleccion.Ubicacion.label("DireccionPunto"),
+            Usuario.Nombre.label("UsuarioNombre"),
+            )
+        .where(RecoleccionUsuario.id_Usuario == usuario_id)
+        .join(PuntoRecoleccion, RecoleccionUsuario.id_PuntoRecoleccion == PuntoRecoleccion.Id)
+        .join(Usuario, RecoleccionUsuario.id_Usuario == Usuario.Id)
+        .order_by(RecoleccionUsuario.Dia.desc(), RecoleccionUsuario.Hora.desc()
+        )
+    )
+    result = await db.execute(query)
+    return result.mappings().all()
 
 async def create_recoleccion(db: AsyncSession, reco: RecoleccionCreate):
     nueva = RecoleccionUsuario(**reco.dict())

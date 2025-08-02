@@ -19,6 +19,9 @@ class RecoleccionUpdate(RecoleccionBase):
 
 class RecoleccionOut(RecoleccionBase):
     Id: int
+    PuntoRecoleccion: str
+    DireccionPunto: str
+    UsuarioNombre: str
 
     class Config:
         orm_mode = True
