@@ -10,7 +10,7 @@ class Empresa(Base):
     Ubicacion = Column(String(255), nullable=True)
     Correo = Column(String(255), nullable=True)
     Telefono = Column(String(20), nullable=True)
-    FechaCreacion = Column(DateTime, server_default=func.now(), nullable=False)
+    FechaCreacion = Column(DateTime, server_default=func.now(), nullable=True)
 
     tipos_reciclaje = relationship("EmpresaTipoReciclaje", back_populates="empresa", cascade="all, delete")
     recolecciones_empresa = relationship("RecoleccionEmpresa", back_populates="empresa", cascade="all, delete")
