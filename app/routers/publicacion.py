@@ -41,56 +41,64 @@ async def obtener_por_usuario(user_id: int, db: AsyncSession = Depends(get_db)):
     return publicaciones
 
 @router.post("/", response_model=int)
-async def crear(data: str = Form(...), db: AsyncSession = Depends(get_db), file: UploadFile = File(None)):
-    
+async def crear(
+    data: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+    file: UploadFile = File(None),
+):
+
     if file:
         print(f"Recibido archivo: {file.filename}, tamaño: {file.size}")
     else:
         print("No se recibió archivo")
 
     try:
-        # Parsear los datos JSON
+        # 1) Parsear JSON y convertir fecha a datetime
         pub_data = json.loads(data)
         pub_data["FechaPublicacion"] = datetime.strptime(
-            pub_data["FechaPublicacion"], 
-            "%Y-%m-%d %H:%M:%S"
+            pub_data["FechaPublicacion"], "%Y-%m-%d %H:%M:%S"
         )
-        
+
+        # 2) Validar/crear la publicación en BD
         publication = PublicacionCreate(**pub_data)
         post = await crud.create(db, publication)
-        
         if not post:
             raise HTTPException(status_code=400, detail="Error al crear la publicación")
-        
+
+        # 3) Si hay archivo, guardarlo en disco y actualizar el registro
         if file:
-            # Obtener la ruta absoluta del directorio base del proyecto
             BASE_DIR = Path(__file__).resolve().parent.parent.parent
             IMAGE_DIR = BASE_DIR / "static" / "imagenes" / "publicaciones"
-            
-            # Crear directorio si no existe
             IMAGE_DIR.mkdir(parents=True, exist_ok=True)
-            
-            # Generar nombre de archivo único
-            file_extension = Path(file.filename).suffix
-            filename = f"img_pub_{post.Id}_user{post.id_Usuario}_{post.FechaPublicacion}{file_extension}"
+
+            # Generar un timestamp seguro para Windows: no usar ':'
+            ts = post.FechaPublicacion.strftime("%Y-%m-%d_%H-%M-%S")
+            ext = Path(file.filename).suffix  # .jpg, .png, etc.
+            filename = f"img_pub_{post.Id}user{post.id_Usuario}{ts}{ext}"
             file_path = IMAGE_DIR / filename
-            
-            # Guardar la imagen
+
+            # Escribir el binario
+            contents = await file.read()
             with open(file_path, "wb") as buffer:
-                buffer.write(await file.read())
-            
-            # Actualizar la publicación con el nombre de la imagen
+                buffer.write(contents)
+
+            # Actualizar el campo Imagen en la BD
             post.Imagen = filename
             await db.commit()
             await db.refresh(post)
-            
-            print(f"Imagen guardada en: {file_path}")  # Para depuración
-        
-        return post.Id
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
+            print(f"Imagen guardada en: {file_path}")
+
+        return post.Id
+
+    except HTTPException:
+        # Re-lanzar HTTPExceptions sin envolver
+        raise
+    except Exception as e:
+        # Cualquier otro error -> 500
+        print("Error al crear publicación:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+    
 @router.put("/{pub_id}", response_model=PublicacionOut)
 async def actualizar(pub_id: int, data: PublicacionUpdate, db: AsyncSession = Depends(get_db)):
     actualizado = await crud.update(db, pub_id, data)
