@@ -8,6 +8,9 @@ from app.routers import (
 from create_db_and_tables import create_tables  # Eliminamos create_database
 
 from fastapi.staticfiles import StaticFiles
+from app.database import SessionLocal
+from seed.seed_superadmin import seed_superadmin
+from seed.seed_tipos_reciclaje import seed_tipos_reciclaje
 import os
 
 app = FastAPI(title="API de Recolección")
@@ -48,6 +51,11 @@ async def startup_event():
     try:
         print("🚀 Ejecutando create_tables()...")
         await create_tables()
+
+        async with SessionLocal() as session:
+            await seed_superadmin(session)
+            await seed_tipos_reciclaje(session)
+
         print("✅ Startup exitoso.")
     except Exception as e:
         print("❌ Error durante startup:", str(e))
