@@ -11,6 +11,7 @@ class ResiduoRecoleccionCreate(ResiduoRecoleccionBase):
 
 class ResiduoRecoleccionOut(ResiduoRecoleccionBase):
     Id: int
+    NombreTipoReciclaje: str
 
     class Config:
         orm_mode = True

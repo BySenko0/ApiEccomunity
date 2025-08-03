@@ -6,6 +6,13 @@ from app.schemas.residuos_recolecciones import ResiduoRecoleccionCreate, Residuo
 
 router = APIRouter(prefix="/residuos_recolecciones", tags=["Residuos Recolecciones"])
 
+@router.get("/{recoleccion_id}", response_model=list[ResiduoRecoleccionOut])
+async def get_residuos_recoleccion(recoleccion_id: int, db: AsyncSession = Depends(get_db)):
+    residuos = await crud.get_by_recoleccion_id(db, recoleccion_id)
+    if not residuos:
+        raise HTTPException(status_code=404, detail="No se encontraron residuos para esta recolección")
+    return residuos
+
 @router.post("/agregar", response_model=bool)
 async def agregar_residuo_recoleccion(data: ResiduoRecoleccionCreate, db: AsyncSession = Depends(get_db)):
    

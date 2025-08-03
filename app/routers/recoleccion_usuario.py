@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
-from app.schemas.recoleccion_usuario import RecoleccionCreate, RecoleccionUpdate, RecoleccionOut
+from app.schemas.recoleccion_usuario import RecoleccionCreate, RecoleccionUpdate, RecoleccionOut, StatusUpdate
 from app.crud import recoleccion_usuario as crud
 
 router = APIRouter(prefix="/recolecciones", tags=["Recolecciones de Usuarios"])
@@ -17,9 +17,24 @@ async def obtener_recoleccion(reco_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Recolección no encontrada")
     return reco
 
-@router.post("/", response_model=RecoleccionOut)
+@router.get("/usuario/{usuario_id}", response_model=list[RecoleccionOut])
+async def obtener_recolecciones_por_usuario(usuario_id: int, db: AsyncSession = Depends(get_db)):
+    reco = await crud.get_recolecciones_by_usuario(db, usuario_id)
+    if not reco:
+        raise HTTPException(status_code=404, detail="No se encontraron recolecciones para este usuario")
+    return reco
+
+@router.post("/actualizar-estatus/{reco_id}", response_model=bool)
+async def actualizar_estatus_recoleccion(reco_id: int, status_update: StatusUpdate, db: AsyncSession = Depends(get_db)):
+    reco = await crud.update_recoleccion_status(db, reco_id, status_update.nuevo_status)
+    if not reco:
+        raise HTTPException(status_code=404, detail="Recolección no encontrada")
+    return True
+
+@router.post("/", response_model=int)
 async def crear_recoleccion(reco: RecoleccionCreate, db: AsyncSession = Depends(get_db)):
-    return await crud.create_recoleccion(db, reco)
+    reco = await crud.create_recoleccion(db, reco)
+    return reco.Id
 
 @router.put("/{reco_id}", response_model=RecoleccionOut)
 async def actualizar_recoleccion(reco_id: int, reco: RecoleccionUpdate, db: AsyncSession = Depends(get_db)):
