@@ -17,6 +17,9 @@ class RecoleccionCreate(RecoleccionBase):
 class RecoleccionUpdate(RecoleccionBase):
     pass
 
+class StatusUpdate(BaseModel):
+    nuevo_status: str
+
 class RecoleccionOut(RecoleccionBase):
     Id: int
     PuntoRecoleccion: str

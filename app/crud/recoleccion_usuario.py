@@ -57,6 +57,16 @@ async def get_recolecciones_by_usuario(db: AsyncSession, usuario_id: int):
     result = await db.execute(query)
     return result.mappings().all()
 
+async def update_recoleccion_status(db: AsyncSession, reco_id: int, nuevo_status: str):
+    reco = await db.execute(select(RecoleccionUsuario).where(RecoleccionUsuario.Id == reco_id))
+    reco = reco.scalar_one_or_none()
+    if reco:
+        reco.Status = nuevo_status
+        await db.commit()
+        await db.refresh(reco)
+        return reco
+    return None
+
 async def create_recoleccion(db: AsyncSession, reco: RecoleccionCreate):
     nueva = RecoleccionUsuario(**reco.dict())
     db.add(nueva)
