@@ -21,7 +21,7 @@ async def obtener_recoleccion(reco_id: int, db: AsyncSession = Depends(get_db)):
 async def obtener_recolecciones_por_usuario(usuario_id: int, db: AsyncSession = Depends(get_db)):
     reco = await crud.get_recolecciones_by_usuario(db, usuario_id)
     if not reco:
-        raise HTTPException(status_code=404, detail="No se encontraron recolecciones para este usuario")
+        return []
     return reco
 
 @router.post("/actualizar-estatus/{reco_id}", response_model=bool)
