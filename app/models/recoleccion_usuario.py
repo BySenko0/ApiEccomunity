@@ -17,3 +17,4 @@ class RecoleccionUsuario(Base):
 
     usuario = relationship("Usuario", back_populates="recolecciones")
     punto_recoleccion = relationship("PuntoRecoleccion", back_populates="recolecciones_usuarios")
+    residuos_recolecciones = relationship("ResiduosRecolecciones", back_populates="recoleccion_usuario", cascade="all, delete-orphan")

@@ -11,3 +11,5 @@ from .comentario import Comentario
 from .bitacora import Bitacora
 from .likes_publicaciones import Likes_Publicaciones
 from .likes_comentarios import Likes_Comentarios
+from .centro_tiporeciclaje import CentroTipoReciclaje
+from .residuos_recolecciones import ResiduosRecolecciones

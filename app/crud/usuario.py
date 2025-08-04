@@ -59,33 +59,38 @@ async def get_usuario_by_id(db: AsyncSession, usuario_id: int) -> Optional[Usuar
     return None
 
 async def create_usuario(db: AsyncSession, usuario: UsuarioCreate) -> Usuario:
-    nuevo_usuario = Usuario(
-        Nombre=usuario.nombre,
-        Correo=usuario.correo,
-        contrasena=hash_password(usuario.contrasena),
-        Ubicacion=usuario.ubicacion,
-        Rol=usuario.rol,
-        Estado=usuario.estado,
-        Cooldown=usuario.cooldown,
-        url_perfil=usuario.url_perfil,
-        Imagen_perfil=usuario.imagen_perfil,
-        Imagen_fondo=usuario.imagen_fondo
-    )
-    db.add(nuevo_usuario)
-    await db.commit()
-    await db.refresh(nuevo_usuario)
-    return nuevo_usuario
+    try:
+        nuevo_usuario = Usuario(
+            Nombre=usuario.nombre,
+            Correo=usuario.correo,
+            contrasena=hash_password(usuario.contrasena),
+            Ubicacion=usuario.ubicacion,
+            Rol=usuario.rol,
+            Estado=usuario.estado,
+            Cooldown=usuario.cooldown,
+            url_perfil=usuario.url_perfil,
+            Imagen_perfil=usuario.imagen_perfil,
+            Imagen_fondo=usuario.imagen_fondo
+        )
+        db.add(nuevo_usuario)
+        await db.commit()
+        await db.refresh(nuevo_usuario)
+        return nuevo_usuario
+    except Exception as e:
+        await db.rollback()
+        raise e
 
 async def update_usuario(
     db: AsyncSession,
     usuario_id: int,
     usuario_data: UsuarioUpdate
 ) -> Usuario | None:
-    usuario = await get_usuario_by_id(db, usuario_id)
+    # Obtener instancia ORM directamente
+    result = await db.execute(select(Usuario).where(Usuario.Id == usuario_id))
+    usuario = result.scalar_one_or_none()
     if not usuario:
         return None
 
-    # Mapeo de campos pydantic -> atributos SQLAlchemy
     field_map = {
         "nombre": "Nombre",
         "ubicacion": "Ubicacion",
@@ -93,6 +98,8 @@ async def update_usuario(
         "estado": "Estado",
         "cooldown": "Cooldown",
         "url_perfil": "url_perfil",
+        "imagen_perfil": "Imagen_perfil",
+        "imagen_fondo": "Imagen_fondo",
     }
     data = usuario_data.dict(exclude_unset=True)
     for key, value in data.items():
@@ -102,11 +109,13 @@ async def update_usuario(
     await db.refresh(usuario)
     return usuario
 
-async def delete_usuario(db: AsyncSession, usuario_id: int) -> Usuario | None:
-    usuario = await get_usuario_by_id(db, usuario_id)
-    if not usuario:
-        return None
+async def delete_usuario(db: AsyncSession, usuario_id: int):
+    result = await db.execute(select(Usuario).where(Usuario.Id == usuario_id))
+    usuario_db = result.scalar_one_or_none()
 
-    await db.delete(usuario)
+    if usuario_db is None:
+        return None  # El endpoint manejará el 404
+
+    await db.delete(usuario_db)
     await db.commit()
-    return usuario
+    return usuario_db

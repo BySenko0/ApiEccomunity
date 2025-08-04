@@ -10,7 +10,7 @@ class PublicacionBase(BaseModel):
     Contenido: Optional[str] = None
     Imagen: Optional[str] = None
     FechaPublicacion: Optional[datetime] = None
-    id_Usuario: int
+    id_Usuario: Optional[int] = None
 
     class Config:
         json_encoders = {
@@ -23,20 +23,6 @@ class PublicacionCreate(PublicacionBase):
 class PublicacionUpdate(PublicacionBase):
     pass
 
-
-class PublicacionOut(BaseModel):
-    Id: int
-    ImagenUrl: HttpUrl | None
-    NombreUsuario: str
-    
-    class Config:
-        orm_mode = True
-        from_attributes = True
-        json_encoders = {
-            'HttpUrl': lambda v: str(v) if v else None
-        }
-
-
 class PublicacionOut(BaseModel):
     Id: int
     Titulo: str
@@ -45,9 +31,9 @@ class PublicacionOut(BaseModel):
     ImagenUrl: Optional[HttpUrl] = None
     ImagenPerfilUsuarioUrl: Optional[HttpUrl] = None
     FechaPublicacion: Optional[datetime] = None
-    id_Usuario: int
-    NombreUsuario: str
-    
+    id_Usuario: Optional[int] = None
+    NombreUsuario: Optional[str] = None
+
     @model_validator(mode='after')
     def construct_image_urls(self) -> 'PublicacionOut':
         if self.Imagen:

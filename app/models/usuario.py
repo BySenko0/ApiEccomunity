@@ -10,7 +10,7 @@ class Usuario(Base):
     Correo = Column(String(255), nullable=False, unique=True)
     contrasena = Column(String(255), nullable=False)
     Ubicacion = Column(String(255), nullable=True)
-    Rol = Column(Enum("usuario", "admin", name="rol_enum"), default="usuario", nullable=False)
+    Rol = Column(Enum("super_admin", "usuario", "admin", "empresa", name="rol_enum"), default="usuario", nullable=False)
     Estado = Column(String(50), nullable=True)
     Cooldown = Column(String(50), nullable=True)
     url_perfil = Column(String(255), nullable=True)

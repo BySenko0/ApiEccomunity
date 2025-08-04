@@ -1,5 +1,6 @@
 # models/tipo_reciclaje.py
-from sqlalchemy import Column, Integer, String, Float, Date
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class TipoReciclaje(Base):
@@ -12,3 +13,5 @@ class TipoReciclaje(Base):
     PagoPorKg = Column(Float, nullable=True)
     GananciaPorKg = Column(Float, nullable=True)
     FechaCreacion = Column(Date, nullable=True)  
+
+    centros_tipos_reciclaje = relationship("CentroTipoReciclaje", back_populates="tipo_reciclaje", cascade="all, delete-orphan")
