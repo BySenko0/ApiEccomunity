@@ -1,8 +1,10 @@
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.publicacion import Publicacion
 from app.schemas.publicacion import PublicacionCreate, PublicacionUpdate
 from app.models.usuario import Usuario
+from app.models.likes_publicaciones import Likes_Publicaciones
 import os
 
 async def get_all(db: AsyncSession):
@@ -154,3 +156,40 @@ async def delete(db: AsyncSession, pub_id: int):
     await db.delete(pub)
     await db.commit()
     return pub
+
+async def get_tendencias(db: AsyncSession):
+    query = (
+        select(
+            Publicacion.Titulo,
+            Publicacion.FechaPublicacion,
+            func.count(Likes_Publicaciones.Id).label("cuenta_likes")
+        )
+        .select_from(
+            Publicacion
+        )
+        .join(Likes_Publicaciones, Likes_Publicaciones.id_Publicacion == Publicacion.Id)
+        .group_by(Publicacion.Id)
+        .order_by(func.count(Likes_Publicaciones.Id).desc())
+        .limit(10)
+    )
+    result = await db.execute(query)
+    tendencias = result.mappings().all()
+    return tendencias
+
+async def get_tendencias_usuarios(db: AsyncSession):
+    query = (
+        select(
+            Usuario.Nombre.label("NombreUsuario"),
+            func.count(Publicacion.Id).label("cuenta_publicaciones")
+        )
+        .select_from(
+            Usuario
+        )
+        .join(Publicacion, Publicacion.id_Usuario == Usuario.Id)
+        .group_by(Usuario.Id)
+        .order_by(func.count(Publicacion.Id).desc())
+        .limit(10)
+    )
+    result = await db.execute(query)
+    tendencias = result.mappings().all()
+    return tendencias

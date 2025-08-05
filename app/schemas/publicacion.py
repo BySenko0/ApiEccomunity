@@ -51,3 +51,17 @@ class PublicacionOut(BaseModel):
             'HttpUrl': lambda v: str(v) if v else None,
             datetime: lambda v: v.isoformat()
         }
+
+class TendenciaOut(BaseModel):
+    Titulo: str
+    cuenta_likes: int
+    FechaPublicacion: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
+class CuentasPublicacionesUsuariosOut(BaseModel):
+    NombreUsuario: str
+    cuenta_publicaciones: int

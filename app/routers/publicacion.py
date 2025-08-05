@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 
 # Schemas and CRUD operations
-from app.schemas.publicacion import PublicacionCreate, PublicacionOut, PublicacionUpdate
+from app.schemas.publicacion import PublicacionCreate, PublicacionOut, PublicacionUpdate, TendenciaOut, CuentasPublicacionesUsuariosOut
 from app.crud import publicacion as crud
 
 # Standard library and utilities
@@ -21,6 +21,21 @@ from typing import Optional
 
 
 router = APIRouter(prefix="/publicaciones", tags=["Publicaciones"])
+
+
+@router.get("/tendencias", response_model=list[TendenciaOut])
+async def obtener_tendencias(db: AsyncSession = Depends(get_db)):
+    tendencias = await crud.get_tendencias(db)
+    if not tendencias:
+        return []
+    return tendencias
+
+@router.get("/top-contribuidores", response_model=list[CuentasPublicacionesUsuariosOut])
+async def obtener_tendencias_usuarios(db: AsyncSession = Depends(get_db)):
+    tendencias = await crud.get_tendencias_usuarios(db)
+    if not tendencias:
+        return []
+    return tendencias
 
 @router.get("/", response_model=list[PublicacionOut])
 async def listar(db: AsyncSession = Depends(get_db)):
@@ -39,6 +54,7 @@ async def obtener_por_usuario(user_id: int, db: AsyncSession = Depends(get_db)):
     if not publicaciones:
         return []
     return publicaciones
+
 
 @router.post("/", response_model=int)
 async def crear(
