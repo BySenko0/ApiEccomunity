@@ -7,7 +7,7 @@ class Usuario(Base):
 
     Id = Column(Integer, primary_key=True, index=True)
     Nombre = Column(String(255), nullable=False)
-    Correo = Column(String(255), nullable=False, unique=True)
+    Correo = Column(String(255), nullable=False)
     contrasena = Column(String(255), nullable=False)
     Ubicacion = Column(String(255), nullable=True)
     Rol = Column(Enum("super_admin", "usuario", "admin", "empresa", name="rol_enum"), default="usuario", nullable=False)

@@ -76,9 +76,11 @@ async def actualizar_imagen_perfil(
         IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
         # Generar nombre único para la imagen
-        ts = datetime.now().strftime("%Y%m%d%H%M%S")
+        # ts = datetime.now().strftime("%Y%m%d%H%M%S")
         ext = Path(file.filename).suffix
-        filename = f"perfil_{usuario_id}_{ts}{ext}"
+        # filename = f"perfil_{usuario_id}_{ts}{ext}"
+        filename = f"perfil_{usuario_id}_{ext}"
+
         file_path = IMAGE_DIR / filename
 
         # Guardar la imagen
@@ -116,9 +118,11 @@ async def actualizar_imagen_fondo(
         IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
         # Generar nombre único para la imagen
-        ts = datetime.now().strftime("%Y%m%d%H%M%S")
+        # ts = datetime.now().strftime("%Y%m%d%H%M%S")
         ext = Path(file.filename).suffix
-        filename = f"fondo_{usuario_id}_{ts}{ext}"
+        # filename = f"fondo_{usuario_id}_{ts}{ext}"
+        filename = f"fondo_{usuario_id}_{ext}"
+
         file_path = IMAGE_DIR / filename
 
         # Guardar la imagen

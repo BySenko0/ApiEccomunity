@@ -37,6 +37,10 @@ async def obtener_tendencias_usuarios(db: AsyncSession = Depends(get_db)):
         return []
     return tendencias
 
+@router.get("/estadisticas/{id_user}", response_model=dict)
+async def obtener_estadisticas(id_user: int, db: AsyncSession = Depends(get_db)):
+    return await crud.get_estadisticas(db, id_user)
+
 @router.get("/", response_model=list[PublicacionOut])
 async def listar(db: AsyncSession = Depends(get_db)):
     return await crud.get_all(db)

@@ -5,6 +5,8 @@ from app.models.publicacion import Publicacion
 from app.schemas.publicacion import PublicacionCreate, PublicacionUpdate
 from app.models.usuario import Usuario
 from app.models.likes_publicaciones import Likes_Publicaciones
+from app.models.recoleccion_usuario import RecoleccionUsuario
+from app.models.residuos_recolecciones import ResiduosRecolecciones
 import os
 
 async def get_all(db: AsyncSession):
@@ -193,3 +195,26 @@ async def get_tendencias_usuarios(db: AsyncSession):
     result = await db.execute(query)
     tendencias = result.mappings().all()
     return tendencias
+
+async def get_estadisticas(db: AsyncSession, id_user: int):
+    query = (
+        select(
+            func.count(RecoleccionUsuario.Id).label("total_recolecciones"),
+            func.sum(ResiduosRecolecciones.Cantidad).label("total_residuos_reciclados"),
+        )
+        .select_from(Usuario)
+        .join(RecoleccionUsuario, RecoleccionUsuario.id_Usuario == Usuario.Id, isouter=True)
+        .join(ResiduosRecolecciones, ResiduosRecolecciones.IdRecoleccionUsuario == RecoleccionUsuario.Id, isouter=True)
+        .where(Usuario.Id == id_user)
+        .group_by(Usuario.Id)
+    )
+    result = await db.execute(query)
+    estadisticas = result.mappings().first()
+    
+    if not estadisticas:
+        return {
+            "total_recolecciones": 0,
+            "total_residuos_reciclados": 0
+        }
+    
+    return dict(estadisticas)
