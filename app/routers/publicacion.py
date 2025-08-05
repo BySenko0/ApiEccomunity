@@ -120,11 +120,24 @@ async def crear(
         raise HTTPException(status_code=500, detail=str(e))
     
 @router.put("/{pub_id}", response_model=PublicacionOut)
-async def actualizar(pub_id: int, data: PublicacionUpdate, db: AsyncSession = Depends(get_db)):
-    actualizado = await crud.update(db, pub_id, data)
-    if not actualizado:
-        raise HTTPException(status_code=404, detail="Publicación no encontrada")
-    return actualizado
+async def actualizar(
+    pub_id: int,
+    data: str = Form(...),                 
+    db: AsyncSession = Depends(get_db),
+    file: UploadFile | None = File(None),  
+):
+    try:
+        payload = json.loads(data)
+        update_data = PublicacionUpdate(**payload)
+
+        actualizado = await crud.update(db, pub_id, update_data, file)
+        if not actualizado:
+            raise HTTPException(status_code=404, detail="Publicación no encontrada")
+        return actualizado
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/{pub_id}")
 async def eliminar(pub_id: int, db: AsyncSession = Depends(get_db)):
