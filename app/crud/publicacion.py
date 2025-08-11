@@ -1,4 +1,7 @@
 from sqlalchemy import func
+from datetime import datetime
+from pathlib import Path
+from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.publicacion import Publicacion
@@ -92,19 +95,58 @@ async def create(db: AsyncSession, data: PublicacionCreate):
     await db.refresh(nueva)
     return nueva
 
-async def update(db: AsyncSession, pub_id: int, data: PublicacionUpdate):
+async def update(
+    db: AsyncSession,
+    pub_id: int,
+    data: PublicacionUpdate,
+    file: UploadFile | None = None
+):
     result = await db.execute(select(Publicacion).where(Publicacion.Id == pub_id))
     pub = result.scalar_one_or_none()
-
     if not pub:
         return None
 
-    for key, value in data.dict(exclude_unset=True).items():
+    for key, value in data.dict(exclude_unset=True, exclude={'Imagen'}).items():
         setattr(pub, key, value)
+
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent
+    IMAGE_DIR = BASE_DIR / "static" / "imagenes" / "publicaciones"
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+    if file:
+        if pub.Imagen:
+            old_path = IMAGE_DIR / pub.Imagen
+            try:
+                if old_path.exists():
+                    old_path.unlink()
+            except Exception:
+                pass
+
+        # Guardar nueva imagen
+        ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        ext = Path(file.filename).suffix or ".jpg"
+        filename = f"img_pub_{pub.Id}_{ts}{ext}"
+        new_path = IMAGE_DIR / filename
+
+        contents = await file.read()
+        with open(new_path, "wb") as buffer:
+            buffer.write(contents)
+
+        pub.Imagen = filename
+
+    # 3) Si explícitamente te envían Imagen vacía (para “quitar” imagen)
+    elif 'Imagen' in data.dict(exclude_unset=True) and not data.Imagen:
+        if pub.Imagen:
+            old_path = IMAGE_DIR / pub.Imagen
+            try:
+                if old_path.exists():
+                    old_path.unlink()
+            except Exception:
+                pass
+        pub.Imagen = None
 
     await db.commit()
     await db.refresh(pub)
-
     return pub
 
 
