@@ -10,7 +10,7 @@ router = APIRouter(prefix="/residuos_recolecciones", tags=["Residuos Recoleccion
 async def get_residuos_recoleccion(recoleccion_id: int, db: AsyncSession = Depends(get_db)):
     residuos = await crud.get_by_recoleccion_id(db, recoleccion_id)
     if not residuos:
-        return []
+        raise HTTPException(status_code=404, detail="No se encontraron residuos para la recolección especificada")
     return residuos
 
 @router.post("/agregar", response_model=bool)
